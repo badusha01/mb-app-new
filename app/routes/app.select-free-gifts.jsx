@@ -475,41 +475,41 @@ export default function SelectFreeGift({
                               gap: "10px",
                             }}
                           >
-                            <div
+                            {/* <div
                               style={{
                                 display: "flex",
                                 justifyContent: "space-between",
                                 alignItems: "center",
                               }}
-                            >
-                              <Text as="span" variant="bodyMd" fontWeight="bold">
-                                {title}
-                              </Text>
-                              {selectedMetafield?.type?.name == "single_line_text_field" || selectedMetafield?.type?.name == "multi_line_text_field" ? (
-                                <>
-                                  <TextField
-                                    label={`Enter ${selectedMetafield.label}`}
-                                    value={inputValue}
-                                    onChange={(val) => handleTextChange(id, val, metafieldKey)}
-                                    multiline={selectedMetafield?.type?.name === "multi_line_text_field" ? 5 : undefined}
-                                    autoComplete="off"
-                                  />
-                                  <ButtonGroup>
-                                    {/* <Button onClick={() => handleCancel(id)}>Cancel</Button> */}
-                                    <Button
-                                      variant="primary"
-                                      onClick={() => handleSaveDescription(id, metafieldKey)}
-                                      disabled={disabledSaveButton[id]}
-                                      loading={saveButton[id]}
-                                    >
-                                      Save
-                                    </Button>
-                                  </ButtonGroup>
-                                </>
-                              ) : (
-                                <Button onClick={() => openResourcePicker(id, selectedMetafield?.type?.name)}>Select Product/Variant</Button>
-                              )}
-                            </div>
+                            > */}
+                            <Text as="span" variant="bodyMd" fontWeight="bold">
+                              {title}
+                            </Text>
+                            {selectedMetafield?.type?.name == "single_line_text_field" || selectedMetafield?.type?.name == "multi_line_text_field" ? (
+                              <>
+                                <TextField
+                                  label={`Enter ${selectedMetafield.label}`}
+                                  value={inputValue}
+                                  onChange={(val) => handleTextChange(id, val, metafieldKey)}
+                                  multiline={selectedMetafield?.type?.name === "multi_line_text_field" ? 5 : undefined}
+                                  autoComplete="off"
+                                />
+                                <ButtonGroup>
+                                  {/* <Button onClick={() => handleCancel(id)}>Cancel</Button> */}
+                                  <Button
+                                    variant="primary"
+                                    onClick={() => handleSaveDescription(id, metafieldKey)}
+                                    disabled={disabledSaveButton[id]}
+                                    loading={saveButton[id]}
+                                  >
+                                    Save
+                                  </Button>
+                                </ButtonGroup>
+                              </>
+                            ) : (
+                              <Button onClick={() => openResourcePicker(id, selectedMetafield?.type?.name)}>Select Product/Variant</Button>
+                            )}
+                            {/* </div> */}
                             {selectedItems.length > 0 && (
                               <div
                                 style={{
