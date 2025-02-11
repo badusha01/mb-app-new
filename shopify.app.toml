@@ -1,0 +1,33 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "1d4a6fa7d4daa3978c0c68ad752d27f4"
+name = "MB Merchandising"
+handle = "mb-merchandising-v04"
+application_url = "https://developing-automotive-maldives-tries.trycloudflare.com"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "badusha-test-store.myshopify.com"
+include_config_on_deploy = true
+
+[access.admin]
+direct_api_mode = "online"
+embedded_app_direct_api_access = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_products,write_products"
+
+[auth]
+redirect_urls = [
+  "https://developing-automotive-maldives-tries.trycloudflare.com/auth/callback",
+  "https://developing-automotive-maldives-tries.trycloudflare.com/auth/shopify/callback",
+  "https://developing-automotive-maldives-tries.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-10"
+
+[pos]
+embedded = false
