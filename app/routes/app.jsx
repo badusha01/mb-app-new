@@ -24,7 +24,7 @@ export default function App() {
           Home1
         </Link>
         <Link to="/app/groups">Groups</Link>
-        <Link to="/app/select-free-gifts">Free  Gifts</Link>
+        {/* <Link to="/app/select-free-gifts">Free  Gifts</Link> */}
       </NavMenu>
       <Outlet />
     </AppProvider>

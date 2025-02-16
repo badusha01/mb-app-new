@@ -3,7 +3,7 @@
 client_id = "1d4a6fa7d4daa3978c0c68ad752d27f4"
 name = "MB Merchandising"
 handle = "mb-merchandising-v04"
-application_url = "https://drainage-developer-boxed-knitting.trycloudflare.com"
+application_url = "https://immunology-von-suit-fit.trycloudflare.com"
 embedded = true
 
 [build]
@@ -21,9 +21,9 @@ scopes = "read_products,write_products"
 
 [auth]
 redirect_urls = [
-  "https://drainage-developer-boxed-knitting.trycloudflare.com/auth/callback",
-  "https://drainage-developer-boxed-knitting.trycloudflare.com/auth/shopify/callback",
-  "https://drainage-developer-boxed-knitting.trycloudflare.com/api/auth/callback"
+  "https://immunology-von-suit-fit.trycloudflare.com/auth/callback",
+  "https://immunology-von-suit-fit.trycloudflare.com/auth/shopify/callback",
+  "https://immunology-von-suit-fit.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

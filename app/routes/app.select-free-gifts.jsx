@@ -218,6 +218,8 @@ export default function SelectFreeGift({
   const [disabledSaveButton, setDisabledSaveButton] = useState({});
   const [textInput, setTextInput] = useState({});
 
+
+
   const loadProducts = async (afterCursor = null, append = false) => {
     setLoading(true);
     const data = await fetchProducts(searchTerm, afterCursor);
@@ -298,11 +300,7 @@ export default function SelectFreeGift({
     setSearchTerm(value);
   };
 
-  const handleChange = (value) => {
-    setValue(value);
-  };
 
-  console.log("SELECTED:", selected);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -324,12 +322,61 @@ export default function SelectFreeGift({
     setHasChanges(false);
     console.log("Metafields updated for changed products.");
   };
+
+  // const openResourcePicker = async (productId, metafieldType) => {
+  //   const pickerResult = await app.resourcePicker({
+  //     type: "product",
+  //     showVariants: false,
+  //     multiple: metafieldType === "list.product_reference" || metafieldType === "product_reference" ?
+  //       metafieldType === "list.product_reference" : false
+  //   });
+
+  //   if (
+  //     pickerResult &&
+  //     pickerResult.selection &&
+  //     pickerResult.selection.length > 0
+  //   ) {
+  //     setSelectedProductsByRow((prev) => {
+  //       const existingSelections = prev[productId] || [];
+
+
+  //       const newSelections = pickerResult.selection.flatMap((item) => {
+  //         return {
+  //           id: item.id,
+  //           title: item.title,
+  //           image: item.images[0]?.src,
+  //           isVariant: false,
+  //         };
+  //       });
+
+  //       const combinedSelections = [...existingSelections, ...newSelections];
+  //       const uniqueSelections = Array.from(
+  //         new Map(combinedSelections.map((item) => [item.id, item])).values()
+  //       );
+  //       setHasChanges(true);
+  //       return {
+  //         ...prev,
+  //         [productId]: uniqueSelections,
+  //       };
+  //     }
+  //     );
+  //   }
+  // };
+
   const openResourcePicker = async (productId, metafieldType) => {
+    // Get previously selected products for this productId
+    const initialSelections = selectedProductsByRow[productId] || [];
+
     const pickerResult = await app.resourcePicker({
       type: "product",
       showVariants: false,
       multiple: metafieldType === "list.product_reference" || metafieldType === "product_reference" ?
-        metafieldType === "list.product_reference" : false
+        metafieldType === "list.product_reference" : false,
+      initialSelections: initialSelections.map(item => ({
+        id: item.id,
+        title: item.title,
+        images: item.image ? [{ src: item.image }] : [],
+      }))
     });
 
     if (
@@ -349,13 +396,10 @@ export default function SelectFreeGift({
           };
         });
 
-
         const combinedSelections = [...existingSelections, ...newSelections];
         const uniqueSelections = Array.from(
           new Map(combinedSelections.map((item) => [item.id, item])).values()
         );
-
-
         setHasChanges(true);
         return {
           ...prev,
@@ -403,7 +447,10 @@ export default function SelectFreeGift({
 
   const handleSaveDescription = async (productId, key) => {
     toggleSaveButtonLoading(productId, true);
-    const textFieldValue = textInput[key][productId] || '';
+    let textFieldValue = textInput[key][productId];
+    if (textFieldValue === "") {
+      textFieldValue = " "; // Use a space instead of an empty string
+    }
     const activeMetafieldData = associatedMetafields.find(metafield => metafield.key === key);
     const result = await updateProductMetafield(productId, textFieldValue, activeMetafieldData);
     toggleSaveButtonState(productId, result);
@@ -411,7 +458,6 @@ export default function SelectFreeGift({
   }
 
   // const handleCancel = (id) => {
-
   // };
 
   const handleSelectChange = (value) => {
@@ -460,8 +506,9 @@ export default function SelectFreeGift({
                       const selectedItems = selectedProductsByRow[id] || [];
                       const metafieldKey = selected;
                       const selectedMetafield = options.find((option) => option.value === selected);
-                      console.log("Selected Metafield: ", selectedMetafield);
+                      // console.log("SelectedMetafield:", selectedMetafield);
                       const inputValue = textInput[metafieldKey]?.[id] || "";
+                      console.log(title, ":", inputValue);
 
                       return (
                         <ResourceItem
@@ -472,7 +519,7 @@ export default function SelectFreeGift({
                             style={{
                               display: "flex",
                               flexDirection: "column",
-                              gap: "10px",
+                              gap: "15px",
                             }}
                           >
                             {/* <div
@@ -523,7 +570,7 @@ export default function SelectFreeGift({
                                   flexWrap: "wrap",
                                 }}
                               >
-                                {console.log("Selected Items", selectedItems)}
+                                {/* {console.log("Selected Items", selectedItems)} */}
                                 {selectedItems.map((item) => (
                                   <div
                                     key={item.id}
@@ -584,7 +631,9 @@ export default function SelectFreeGift({
         style={{
           marginTop: "15px",
         }}
-      ></div>
+      >
+
+      </div>
 
 
 
@@ -609,3 +658,18 @@ export default function SelectFreeGift({
     </Frame >
   );
 }
+
+/*
+TODO
+
+Add the group name in the Assign meta fields modal (for which group we are assigning metafield) - done
+Fix UI issue when adding a new group (group is created twice in the UI - issue with array) -done
+Implement two way data sharing for product recommendation
+Show 'No Metafields Selected' when metafields are not assigned
+*/
+
+/*
+ Check the product fetching api for details more than Id of products
+ Check Thumbnail for UI of selected products
+ setSelectedProductsByRow
+ */

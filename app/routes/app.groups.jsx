@@ -60,53 +60,92 @@ export default function Groups() {
 
   const handleGroupNameChange = (value) => setGroupName(value);
 
+  // useEffect(() => {
+  //   if (fetcher.data && fetcher.data.name && fetcher.data.id) {
+  //     setMetafieldGroups((prevGroups) => [
+  //       ...prevGroups,
+  //       fetcher.data
+  //     ]);
+  //   }
+
+  //   if (fetcher.data && fetcher.data.deletedId) {
+  //     setMetafieldGroups((prevGroups) =>
+  //       prevGroups.filter((group) => group.id !== fetcher.data.deletedId)
+  //     );
+  //   }
+  // }, [fetcher.data]);//will be called after action submit
+
+  // useEffect(() => {
+  //   if (fetcher.data && fetcher.data.name && fetcher.data.id) {
+  //     setMetafieldGroups((prevGroups) => [
+  //       ...prevGroups,
+  //       fetcher.data
+  //     ]);
+  //   }
+
+  //   if (fetcher.data && fetcher.data.success && fetcher.data.updatedGroup) {
+  //     setMetafieldGroups((prevGroups) => {
+  //       const updatedGroups = [...prevGroups];
+  //       const groupIndex = updatedGroups.findIndex((group) => group.id === fetcher.data.updatedGroup.id);
+
+  //       if (groupIndex !== -1) {
+  //         updatedGroups[groupIndex] = fetcher.data.updatedGroup;
+  //       }
+  //       return updatedGroups;
+  //     });
+  //     setUpdateIndex(!updateIndex); //update the tabIndex
+  //   }
+
+  //   if (fetcher.data && fetcher.data.deletedId && fetcher.data.tabIndex) {
+  //     setMetafieldGroups((prevGroups) =>
+  //       prevGroups.filter((group) => group.id !== fetcher.data.deletedId)
+  //     );
+
+  //     setSelectedMetafields((prev) => {
+  //       const updatedGroups = [...prev];
+  //       const groupIndex = fetcher.data.tabIndex
+
+  //       if (groupIndex !== -1) {
+  //         updatedGroups.splice(groupIndex, 1);
+  //       }
+  //       return updatedGroups;
+  //     });
+
+  //     setActiveTabIndex(0);
+  //   }
+  // }, [fetcher.data]);
+
   useEffect(() => {
-    if (fetcher.data && fetcher.data.name && fetcher.data.id) {
-      setMetafieldGroups((prevGroups) => [
-        ...prevGroups,
-        fetcher.data
-      ]);
-    }
+    if (!fetcher.data) return;
 
-    if (fetcher.data && fetcher.data.deletedId) {
-      setMetafieldGroups((prevGroups) =>
-        prevGroups.filter((group) => group.id !== fetcher.data.deletedId)
-      );
-    }
-  }, [fetcher.data]);//will be called after action submit
-
-  useEffect(() => {
-    if (fetcher.data && fetcher.data.name && fetcher.data.id) {
-      setMetafieldGroups((prevGroups) => [
-        ...prevGroups,
-        fetcher.data
-      ]);
-    }
-
-    if (fetcher.data && fetcher.data.success && fetcher.data.updatedGroup) {
+    if (fetcher.data.name && fetcher.data.id) {
       setMetafieldGroups((prevGroups) => {
-        const updatedGroups = [...prevGroups];
-        const groupIndex = updatedGroups.findIndex((group) => group.id === fetcher.data.updatedGroup.id);
-
-        if (groupIndex !== -1) {
-          updatedGroups[groupIndex] = fetcher.data.updatedGroup;
+        // Check if the group already exists before adding
+        if (prevGroups.some((group) => group.id === fetcher.data.id)) {
+          return prevGroups;
         }
-        return updatedGroups;
+        return [...prevGroups, fetcher.data];
       });
-      setUpdateIndex(!updateIndex); //update the tabIndex
     }
 
-    if (fetcher.data && fetcher.data.deletedId && fetcher.data.tabIndex) {
+    if (fetcher.data.success && fetcher.data.updatedGroup) {
+      setMetafieldGroups((prevGroups) => {
+        return prevGroups.map((group) =>
+          group.id === fetcher.data.updatedGroup.id ? fetcher.data.updatedGroup : group
+        );
+      });
+      setUpdateIndex(!updateIndex);
+    }
+
+    if (fetcher.data.deletedId) {
       setMetafieldGroups((prevGroups) =>
         prevGroups.filter((group) => group.id !== fetcher.data.deletedId)
       );
 
       setSelectedMetafields((prev) => {
         const updatedGroups = [...prev];
-        const groupIndex = fetcher.data.tabIndex
-
-        if (groupIndex !== -1) {
-          updatedGroups.splice(groupIndex, 1);
+        if (fetcher.data.tabIndex !== undefined) {
+          updatedGroups.splice(fetcher.data.tabIndex, 1);
         }
         return updatedGroups;
       });
@@ -134,8 +173,21 @@ export default function Groups() {
     return [];
   }
 
+  // const handleAddGroup = (event) => {
+  //   event.preventDefault();
+  //   fetcher.submit({ name: groupName }, { method: 'post' });
+  //   setGroupName('');
+  // };
+
   const handleAddGroup = (event) => {
     event.preventDefault();
+    const lowerCaseGroupName = groupName.toLowerCase();
+    // Check if the group name already exists
+    if (metafieldGroups.some((group) => group.name.toLowerCase() === lowerCaseGroupName)) {
+
+      shopify.toast.show('This Group Name Already Exists');
+      return;
+    }
     fetcher.submit({ name: groupName }, { method: 'post' });
     setGroupName('');
   };
@@ -166,9 +218,9 @@ export default function Groups() {
               edges {
                 node {
                   id
+                  name
                   namespace
                   key
-                  name
                   type {
                     valueType
                     name
@@ -309,7 +361,6 @@ export default function Groups() {
 
                   <SelectFreeGift groupId={group.id} associatedMetafields={tempSelectedMetafields} tabIndex={updateIndex} />
 
-
                 </div>
               )}
             </div>
@@ -333,7 +384,7 @@ export default function Groups() {
       >
         <Modal.Section>
           <Card sectioned>
-            <Text variant="headingMd" as="h2">Assign Metafields</Text>
+            <Text variant="headingMd" as="h2" >Assign Metafields for {metafieldGroups[activeTabIndex]?.name} </Text>
             <Layout>
               {metafieldDefinitions.map((definition) => (
                 <Layout.Section key={definition.id} oneHalf>
