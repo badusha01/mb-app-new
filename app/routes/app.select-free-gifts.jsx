@@ -323,61 +323,14 @@ export default function SelectFreeGift({
     console.log("Metafields updated for changed products.");
   };
 
-  // const openResourcePicker = async (productId, metafieldType) => {
-  //   const pickerResult = await app.resourcePicker({
-  //     type: "product",
-  //     showVariants: false,
-  //     multiple: metafieldType === "list.product_reference" || metafieldType === "product_reference" ?
-  //       metafieldType === "list.product_reference" : false
-  //   });
-
-  //   if (
-  //     pickerResult &&
-  //     pickerResult.selection &&
-  //     pickerResult.selection.length > 0
-  //   ) {
-  //     setSelectedProductsByRow((prev) => {
-  //       const existingSelections = prev[productId] || [];
-
-
-  //       const newSelections = pickerResult.selection.flatMap((item) => {
-  //         return {
-  //           id: item.id,
-  //           title: item.title,
-  //           image: item.images[0]?.src,
-  //           isVariant: false,
-  //         };
-  //       });
-
-  //       const combinedSelections = [...existingSelections, ...newSelections];
-  //       const uniqueSelections = Array.from(
-  //         new Map(combinedSelections.map((item) => [item.id, item])).values()
-  //       );
-  //       setHasChanges(true);
-  //       return {
-  //         ...prev,
-  //         [productId]: uniqueSelections,
-  //       };
-  //     }
-  //     );
-  //   }
-  // };
-
   const openResourcePicker = async (productId, metafieldType) => {
-    // Get previously selected products for this productId
-    const initialSelections = selectedProductsByRow[productId] || [];
-
     const pickerResult = await app.resourcePicker({
       type: "product",
       showVariants: false,
       multiple: metafieldType === "list.product_reference" || metafieldType === "product_reference" ?
-        metafieldType === "list.product_reference" : false,
-      initialSelections: initialSelections.map(item => ({
-        id: item.id,
-        title: item.title,
-        images: item.image ? [{ src: item.image }] : [],
-      }))
+        metafieldType === "list.product_reference" : false
     });
+    console.log("PickerResult:", pickerResult);
 
     if (
       pickerResult &&
@@ -405,9 +358,56 @@ export default function SelectFreeGift({
           ...prev,
           [productId]: uniqueSelections,
         };
-      });
+      }
+      );
     }
   };
+
+  // const openResourcePicker = async (productId, metafieldType) => {
+  //   // Get previously selected products for this productId
+  //   const initialSelections = selectedProductsByRow[productId] || [];
+
+  //   const pickerResult = await app.resourcePicker({
+  //     type: "product",
+  //     showVariants: false,
+  //     multiple: metafieldType === "list.product_reference" || metafieldType === "product_reference" ?
+  //       metafieldType === "list.product_reference" : false,
+  //     initialSelections: initialSelections.map(item => ({
+  //       id: item.id,
+  //       title: item.title,
+  //       images: item.image ? [{ src: item.image }] : [],
+  //     }))
+  //   });
+
+  //   if (
+  //     pickerResult &&
+  //     pickerResult.selection &&
+  //     pickerResult.selection.length > 0
+  //   ) {
+  //     setSelectedProductsByRow((prev) => {
+  //       const existingSelections = prev[productId] || [];
+
+  //       const newSelections = pickerResult.selection.flatMap((item) => {
+  //         return {
+  //           id: item.id,
+  //           title: item.title,
+  //           image: item.images[0]?.src,
+  //           isVariant: false,
+  //         };
+  //       });
+
+  //       const combinedSelections = [...existingSelections, ...newSelections];
+  //       const uniqueSelections = Array.from(
+  //         new Map(combinedSelections.map((item) => [item.id, item])).values()
+  //       );
+  //       setHasChanges(true);
+  //       return {
+  //         ...prev,
+  //         [productId]: uniqueSelections,
+  //       };
+  //     });
+  //   }
+  // };
 
   const removeProduct = (productId, selectedItemId) => {
     setSelectedProductsByRow((prev) => {
@@ -449,7 +449,7 @@ export default function SelectFreeGift({
     toggleSaveButtonLoading(productId, true);
     let textFieldValue = textInput[key][productId];
     if (textFieldValue === "") {
-      textFieldValue = " "; // Use a space instead of an empty string
+      textFieldValue = null;
     }
     const activeMetafieldData = associatedMetafields.find(metafield => metafield.key === key);
     const result = await updateProductMetafield(productId, textFieldValue, activeMetafieldData);
@@ -508,7 +508,7 @@ export default function SelectFreeGift({
                       const selectedMetafield = options.find((option) => option.value === selected);
                       // console.log("SelectedMetafield:", selectedMetafield);
                       const inputValue = textInput[metafieldKey]?.[id] || "";
-                      console.log(title, ":", inputValue);
+                      // console.log(title, ":", inputValue);
 
                       return (
                         <ResourceItem

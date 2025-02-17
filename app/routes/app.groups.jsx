@@ -116,6 +116,7 @@ export default function Groups() {
   // }, [fetcher.data]);
 
   useEffect(() => {
+
     if (!fetcher.data) return;
 
     if (fetcher.data.name && fetcher.data.id) {
@@ -126,6 +127,7 @@ export default function Groups() {
         }
         return [...prevGroups, fetcher.data];
       });
+      setTempSelectedMetafields([]);
     }
 
     if (fetcher.data.success && fetcher.data.updatedGroup) {
@@ -150,9 +152,15 @@ export default function Groups() {
         return updatedGroups;
       });
 
+      setTempSelectedMetafields([]);
       setActiveTabIndex(0);
     }
   }, [fetcher.data]);
+
+  useEffect(() => {
+    const initializedMetafields = initializeMetafields();
+    setTempSelectedMetafields(initializedMetafields[0] || []);
+  }, []);
 
 
   const initializeMetafields = () => {
@@ -168,6 +176,7 @@ export default function Groups() {
         }));
       });
       setSelectedMetafields(newSelectedMetafields);
+      console.log('initializeMetafields executed');
       return newSelectedMetafields;
     }
     return [];
@@ -190,10 +199,19 @@ export default function Groups() {
     }
     fetcher.submit({ name: groupName }, { method: 'post' });
     setGroupName('');
+    console.log("HandleAddGroup Executed");
   };
 
   const handleDeleteGroup = (id) => {
     fetcher.submit({ deleteId: id.toString() }, { method: 'post' });
+    setSelectedMetafields((prev) => {
+      const updated = [...prev];
+      const groupIndex = metafieldGroups.findIndex((group) => group.id === id);
+      if (groupIndex !== -1) {
+        updated.splice(groupIndex, 1);
+      }
+      return updated;
+    });
   };
 
   const tabs = metafieldGroups.map((group) => ({
@@ -202,6 +220,8 @@ export default function Groups() {
   }));
 
   const handleTabChange = (index) => {
+    console.log('handleTabChange is executed');
+    console.log('Selected Metafields:', selectedMetafields);
     setActiveTabIndex(index);
     setTempSelectedMetafields(selectedMetafields[index]);
   };
@@ -269,6 +289,7 @@ export default function Groups() {
           type: definition.type
         }]
       }
+      console.log('handleCheckboxChange is executed');
       return updated;
     });
   };
@@ -312,11 +333,17 @@ export default function Groups() {
         namespace: data.namespace,
         key: data.key,
         type: data.type
-      }))
+      }));
+      console.log("handleAssign is executed");
+      console.log("Updated Selected Metafields: ", updated);
       return updated
     })
     setTempSelectedMetafields(selectedMetafields[activeTabIndex]);
     setModalOpen(false);
+    console.log("HandleAssign Executed");
+    // setTimeout(() => {
+    //   window.location.reload();
+    // }, 0);
   };
 
 
@@ -369,11 +396,10 @@ export default function Groups() {
       </Card>
 
 
-
       <Modal
         open={modalOpen}
         onClose={() => {
-          initializeMetafields()
+          // initializeMetafields();
           setModalOpen(false)
         }}
         title="Assign Metafields"
@@ -405,3 +431,15 @@ export default function Groups() {
     </Page>
   );
 }
+
+
+/*
+Use console.log() in each function so that you can see which ones are working when tab is switched or when a metafields are selected and unselected
+*/
+
+
+/*
+Fixed the issue with duplicated names of group
+Fixed the issue of not showing selected metafields of a group when it is rendered
+
+*/
