@@ -548,115 +548,39 @@ export default function SelectFreeGift({
   };
 
   // Open the resource picker with initial selections.
-  // const openResourcePicker = async (productId, metafieldType) => {
-  //   const multiple = metafieldType.includes("list");
-  //   const group = selectedProductsByGroup[activeTabIndex] || {};
-  //   const currentEntries = group[selected] || [];
-  //   const entry = currentEntries.find((e) => e.productId === productId);
-  //   const entryIDs = entry ? entry.selections.map((item) => ({ id: item.id })) : []
-
-  //   console.log("Entry:", entry);
-  //   console.log("ENIDS:", entryIDs)
-  //   const pickerResult = await app.resourcePicker({
-  //     type: "product",
-  //     filter: {
-  //       variants: false,
-  //     },
-  //     multiple,
-  //     selectionIds: entryIDs
-  //   });
-  //   // console.log("Picker Result Selection IDs:", pickerResult.selection.map(item => item.id));
-  //   console.log("PickerResult:", pickerResult);
-  //   if (pickerResult && pickerResult.selection && pickerResult.selection.length > 0) {
-  //     setSelectedProductsByGroup((prev) => {
-  //       const group = prev[activeTabIndex] || {};
-  //       const currentEntries = group[selected] || [];
-  //       const idx = currentEntries.findIndex((entry) => entry.productId === productId);
-  //       let newEntry;
-  //       if (!metafieldType.includes("list")) {
-  //         // For single product reference, override any existing selection.
-  //         newEntry = {
-  //           productId,
-  //           selections: [
-  //             {
-  //               id: pickerResult.selection[0].id,
-  //               title: pickerResult.selection[0].title,
-  //               image: pickerResult.selection[0].images[0]?.src,
-  //               isVariant: false,
-  //             },
-  //           ],
-  //         };
-  //       } else {
-  //         // For list type, merge new selections.
-  //         let existingSelections = idx !== -1 ? currentEntries[idx].selections : [];
-  //         const newSelections = pickerResult.selection.map((item) => ({
-  //           id: item.id,
-  //           title: item.title,
-  //           image: item.images[0]?.src,
-  //           isVariant: false,
-  //         }));
-  //         const combinedSelections = [...existingSelections, ...newSelections];
-  //         const uniqueSelections = Array.from(new Map(combinedSelections.map((item) => [item.id, item])).values());
-  //         newEntry = { productId, selections: uniqueSelections };
-  //       }
-  //       let newEntries = idx !== -1
-  //         ? currentEntries.map((entry) => (entry.productId === productId ? newEntry : entry))
-  //         : [...currentEntries, newEntry];
-  //       setHasChanges(true);
-  //       return {
-  //         ...prev,
-  //         [activeTabIndex]: {
-  //           ...group,
-  //           [selected]: newEntries,
-  //         },
-  //       };
-  //     });
-  //   }
-  // };
-
-
   const openResourcePicker = async (productId, metafieldType) => {
     const multiple = metafieldType.includes("list");
     const group = selectedProductsByGroup[activeTabIndex] || {};
     const currentEntries = group[selected] || [];
     const entry = currentEntries.find((e) => e.productId === productId);
-    const entryIDs = entry ? entry.selections.map((item) => ({ id: item.id })) : [];
+    const entryIDs = entry ? entry.selections.map((item) => ({ id: item.id })) : []
+    const productWithSpecificVariantsSelected = {
+      id: 'gid://shopify/Product/8771756425475',
+      variants: [],
+    };
+    // const initialSelectionIds = [
+    //   { id: "gid://shopify/Product/8771756425475" }
+    // ];
 
+    // console.log("Initial Selection IDs:", initialSelectionIds);
     console.log("Entry:", entry);
-    console.log("ENIDS:", entryIDs);
-
+    console.log("ENIDS:", entryIDs)
     const pickerResult = await app.resourcePicker({
       type: "product",
-      filter: { variants: false },
+      showVariants: false,
       multiple,
-      selectionIds: entryIDs,
+      selectionIds: [productWithSpecificVariantsSelected]
     });
-
+    // console.log("Picker Result Selection IDs:", pickerResult.selection.map(item => item.id));
     console.log("PickerResult:", pickerResult);
-
-    // Update state if pickerResult is defined
-    if (pickerResult && pickerResult.selection) {
+    if (pickerResult && pickerResult.selection && pickerResult.selection.length > 0) {
       setSelectedProductsByGroup((prev) => {
         const group = prev[activeTabIndex] || {};
         const currentEntries = group[selected] || [];
         const idx = currentEntries.findIndex((entry) => entry.productId === productId);
-
-        // If no items are selected, remove the entry entirely
-        if (pickerResult.selection.length === 0) {
-          const newEntries = currentEntries.filter((entry) => entry.productId !== productId);
-          setHasChanges(true);
-          return {
-            ...prev,
-            [activeTabIndex]: {
-              ...group,
-              [selected]: newEntries,
-            },
-          };
-        }
-
         let newEntry;
         if (!metafieldType.includes("list")) {
-          // For single product reference, override with the first selection.
+          // For single product reference, override any existing selection.
           newEntry = {
             productId,
             selections: [
@@ -669,23 +593,21 @@ export default function SelectFreeGift({
             ],
           };
         } else {
-          // For list type, override current selections with the new picker selection.
-          newEntry = {
-            productId,
-            selections: pickerResult.selection.map((item) => ({
-              id: item.id,
-              title: item.title,
-              image: item.images[0]?.src,
-              isVariant: false,
-            })),
-          };
+          // For list type, merge new selections.
+          let existingSelections = idx !== -1 ? currentEntries[idx].selections : [];
+          const newSelections = pickerResult.selection.map((item) => ({
+            id: item.id,
+            title: item.title,
+            image: item.images[0]?.src,
+            isVariant: false,
+          }));
+          const combinedSelections = [...existingSelections, ...newSelections];
+          const uniqueSelections = Array.from(new Map(combinedSelections.map((item) => [item.id, item])).values());
+          newEntry = { productId, selections: uniqueSelections };
         }
-
-        const newEntries =
-          idx !== -1
-            ? currentEntries.map((entry) => (entry.productId === productId ? newEntry : entry))
-            : [...currentEntries, newEntry];
-
+        let newEntries = idx !== -1
+          ? currentEntries.map((entry) => (entry.productId === productId ? newEntry : entry))
+          : [...currentEntries, newEntry];
         setHasChanges(true);
         return {
           ...prev,
@@ -1031,5 +953,3 @@ export default function SelectFreeGift({
 }
 
 
-
-// Check the payload in api for product variants data

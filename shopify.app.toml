@@ -3,7 +3,7 @@
 client_id = "1d4a6fa7d4daa3978c0c68ad752d27f4"
 name = "MB Merchandising"
 handle = "mb-merchandising-v04"
-application_url = "https://betting-milan-semester-spell.trycloudflare.com"
+application_url = "https://stevens-anne-shadow-disclaimer.trycloudflare.com"
 embedded = true
 
 [build]
@@ -21,9 +21,9 @@ scopes = "read_products,write_products"
 
 [auth]
 redirect_urls = [
-  "https://betting-milan-semester-spell.trycloudflare.com/auth/callback",
-  "https://betting-milan-semester-spell.trycloudflare.com/auth/shopify/callback",
-  "https://betting-milan-semester-spell.trycloudflare.com/api/auth/callback"
+  "https://stevens-anne-shadow-disclaimer.trycloudflare.com/auth/callback",
+  "https://stevens-anne-shadow-disclaimer.trycloudflare.com/auth/shopify/callback",
+  "https://stevens-anne-shadow-disclaimer.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
