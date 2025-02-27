@@ -162,6 +162,10 @@ export default function Groups() {
     setTempSelectedMetafields(initializedMetafields[0] || []);
   }, []);
 
+  useEffect(() => {
+    setTempSelectedMetafields(selectedMetafields[activeTabIndex] || []);
+  }, [activeTabIndex, selectedMetafields]);
+
 
   const initializeMetafields = () => {
     if (metafieldGroups) {
@@ -295,18 +299,16 @@ export default function Groups() {
   };
 
 
-
-
   const handleAssign = () => {
     const metafieldData = selectedMetafields[activeTabIndex].map((data) => {
       // Find the definition corresponding to the selected metafield ID
       const definition = metafieldDefinitions.find((def) => def.id === data.id);
       return {
-        id: data.id, // Metafield ID
+        id: data.id,
         name: definition?.name,
-        namespace: definition?.namespace || "", // Namespace from the definition
-        key: definition?.key || "", // Key from the definition
-        type: { // const handleCheckboxChange = (definition) => {
+        namespace: definition?.namespace || "",
+        key: definition?.key || "",
+        type: {
           valueType: definition?.type?.valueType || "",
           name: definition?.type?.name
         },
@@ -386,7 +388,7 @@ export default function Groups() {
                     </div>
                   </div>
 
-                  <SelectFreeGift groupId={group.id} associatedMetafields={tempSelectedMetafields} tabIndex={updateIndex} />
+                  <SelectFreeGift groupId={group.id} associatedMetafields={selectedMetafields[activeTabIndex] || []} tabIndex={updateIndex} activeTabIndex={activeTabIndex} />
 
                 </div>
               )}
