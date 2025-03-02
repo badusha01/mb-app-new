@@ -3,7 +3,7 @@
 client_id = "1d4a6fa7d4daa3978c0c68ad752d27f4"
 name = "MB Merchandising"
 handle = "mb-merchandising-v04"
-application_url = "https://stevens-anne-shadow-disclaimer.trycloudflare.com"
+application_url = "https://departure-inventory-nm-pounds.trycloudflare.com"
 embedded = true
 
 [build]
@@ -21,9 +21,9 @@ scopes = "read_products,write_products"
 
 [auth]
 redirect_urls = [
-  "https://stevens-anne-shadow-disclaimer.trycloudflare.com/auth/callback",
-  "https://stevens-anne-shadow-disclaimer.trycloudflare.com/auth/shopify/callback",
-  "https://stevens-anne-shadow-disclaimer.trycloudflare.com/api/auth/callback"
+  "https://departure-inventory-nm-pounds.trycloudflare.com/auth/callback",
+  "https://departure-inventory-nm-pounds.trycloudflare.com/auth/shopify/callback",
+  "https://departure-inventory-nm-pounds.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

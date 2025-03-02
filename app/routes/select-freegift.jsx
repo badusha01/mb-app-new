@@ -514,22 +514,16 @@ export default function SelectFreeGift({
     const currentEntries = group[selected] || [];
     const entry = currentEntries.find((e) => e.productId === productId);
     const entryIDs = entry ? entry.selections.map((item) => ({ id: item.id })) : []
-    const productWithSpecificVariantsSelected = {
-      id: 'gid://shopify/Product/8771756425475',
-      variants: [],
-    };
-    // const initialSelectionIds = [
-    //   { id: "gid://shopify/Product/8771756425475" }
-    // ];
 
-    // console.log("Initial Selection IDs:", initialSelectionIds);
     console.log("Entry:", entry);
     console.log("ENIDS:", entryIDs)
     const pickerResult = await app.resourcePicker({
       type: "product",
-      showVariants: false,
+      filter: {
+        variants: false,
+      },
       multiple,
-      selectionIds: [productWithSpecificVariantsSelected]
+      selectionIds: entryIDs
     });
     // console.log("Picker Result Selection IDs:", pickerResult.selection.map(item => item.id));
     console.log("PickerResult:", pickerResult);
