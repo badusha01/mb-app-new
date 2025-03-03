@@ -159,107 +159,6 @@ async function updateMetafield(productId, gifts, metafieldData) {
   }
 }
 
-// const updateProductMetafield = async (productId, value, activeMetafieldData) => {
-//   const query = `
-//     mutation updateProductMetafield($input: ProductInput!) {
-//       productUpdate(input: $input) {
-//         product {
-//           id
-//           metafields(first: 10) {
-//             edges {
-//               node {
-//                 id
-//                 namespace
-//                 key
-//                 value
-//                 type
-//               }
-//             }
-//           }
-//         }
-//         userErrors {
-//           field
-//           message
-//         }
-//       }
-//     }
-//   `;
-//   const metafieldValue = value === null || value === "" ? "" : value;
-//   const variables = {
-//     input: {
-//       id: productId,
-//       metafields: [
-//         {
-//           namespace: activeMetafieldData.namespace,
-//           key: activeMetafieldData.key,
-//           value: metafieldValue,
-//           type: activeMetafieldData.type.name,
-//         },
-//       ],
-//     },
-//   };
-//   try {
-//     const response = await fetch("shopify:admin/api/graphql.json", {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({ query, variables }),
-//     });
-//     const responseData = await response.json();
-//     if (responseData.errors) {
-//       shopify.toast.show(`Error updating metafield: ${responseData.errors}`);
-//       console.log("Error updating metafield:", responseData.errors);
-//     } else if (responseData.data.productUpdate.userErrors.length > 0) {
-//       shopify.toast.show("User errors");
-//     } else {
-//       shopify.toast.show("Metafield updated successfully");
-//     }
-//     return true;
-//   } catch (error) {
-//     console.error("Request failed:", error);
-//     return false;
-//   }
-// };
-
-// async function deleteMetafield(metafieldId) {
-//   const mutation = `
-//     mutation metafieldDelete($input: MetafieldDeleteInput!) {
-//       metafieldDelete(input: $input) {
-//         deletedId
-//         userErrors {
-//           field
-//           message
-//         }
-//       }
-//     }
-//   `;
-//   const variables = { input: { id: metafieldId } };
-//   try {
-//     const response = await fetch("shopify:admin/api/graphql.json", {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({ query: mutation, variables }),
-//     });
-//     const result = await response.json();
-//     if (
-//       result.data &&
-//       result.data.metafieldDelete &&
-//       result.data.metafieldDelete.deletedId
-//     ) {
-//       console.log("Metafield deleted successfully");
-//       return true;
-//     } else {
-//       console.error(
-//         "Error deleting metafield:",
-//         result.errors || result.data.metafieldDelete.userErrors
-//       );
-//       return false;
-//     }
-//   } catch (error) {
-//     console.error("Request failed:", error);
-//     return false;
-//   }
-// }
-
 
 const updateProductMetafield = async (productId, value, activeMetafieldData) => {
   const query = `
@@ -370,21 +269,8 @@ export default function SelectFreeGift({
   const app = useAppBridge();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-
-
-  // We store selections as an object keyed first by active group (activeTabIndex)
-  // then by the current metafield key. For example:
-  // {
-  //   "0": {
-  //      "product_reference": [ { productId, selections: [ ... ] } ],
-  //      "list.product_reference": [ ... ]
-  //   },
-  //   "1": { ... }
-  // }
-
   const [selectedProductsByGroup, setSelectedProductsByGroup] = useState({});
   const [initialProductsByGroup, setInitialProductsByGroup] = useState({});
-
   const [hasChanges, setHasChanges] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [nextCursor, setNextCursor] = useState(null);
@@ -472,18 +358,6 @@ export default function SelectFreeGift({
           associatedMetafields.find((m) => m.key === metafield.key)?.type.name.includes("list") &&
           metafield.value
         ) {
-          // try {
-          //   const parsedIds = JSON.parse(metafield.value);
-          //   selections = parsedIds.map((id) => ({
-          //     id,
-          //     // You might need to fetch additional details like title and images if necessary.
-          //     title: "Saved Product",
-          //     images: [],
-          //   }));
-          //   console.log("Parsed Id:", metafield)
-          // } catch (e) {
-          //   console.error("Failed to parse metafield value", e);
-          // }
 
           try {
             const parsedIds = JSON.parse(metafield.value);
@@ -623,97 +497,6 @@ export default function SelectFreeGift({
     setSearchTerm(value);
   };
 
-  // const handleSubmit = async (event) => {
-  //   event.preventDefault();
-  //   const activeMetafieldData = associatedMetafields.find(
-  //     (metafield) => metafield.key === selected
-  //   );
-  //   const groupData = selectedProductsByGroup[activeTabIndex] || {};
-  //   const groupSelected = groupData[selected] || [];
-  //   const groupInitial = (initialProductsByGroup[activeTabIndex] || {})[selected] || [];
-  //   for (const entry of groupSelected) {
-  //     const productId = entry.productId;
-  //     const initialEntry = groupInitial.find((item) => item.productId === productId);
-  //     const currentSelections = entry.selections;
-  //     const initialSelections = initialEntry ? initialEntry.selections : [];
-  //     if (JSON.stringify(currentSelections) !== JSON.stringify(initialSelections)) {
-  //       const selectedGifts = currentSelections.map((item) => ({
-  //         id: item.id,
-  //         title: item.title,
-  //       }));
-  //       await updateMetafield(productId, selectedGifts, activeMetafieldData);
-  //     }
-  //   }
-  //   setHasChanges(false);
-  //   console.log("Metafields updated for changed products.");
-  // };
-
-  // Open the resource picker with initial selections.
-  // const openResourcePicker = async (productId, metafieldType) => {
-  //   const multiple = metafieldType.includes("list");
-  //   const group = selectedProductsByGroup[activeTabIndex] || {};
-  //   const currentEntries = group[selected] || [];
-  //   const entry = currentEntries.find((e) => e.productId === productId);
-  //   const entryIDs = entry ? entry.selections.map((item) => ({ id: item.id })) : []
-
-  //   console.log("Entry:", entry);
-  //   console.log("ENIDS:", entryIDs)
-  //   const pickerResult = await app.resourcePicker({
-  //     type: "product",
-  //     filter: {
-  //       variants: false,
-  //     },
-  //     multiple,
-  //     selectionIds: entryIDs
-  //   });
-  //   // console.log("Picker Result Selection IDs:", pickerResult.selection.map(item => item.id));
-  //   console.log("PickerResult:", pickerResult);
-  //   if (pickerResult && pickerResult.selection && pickerResult.selection.length > 0) {
-  //     setSelectedProductsByGroup((prev) => {
-  //       const group = prev[activeTabIndex] || {};
-  //       const currentEntries = group[selected] || [];
-  //       const idx = currentEntries.findIndex((entry) => entry.productId === productId);
-  //       let newEntry;
-  //       if (!metafieldType.includes("list")) {
-  //         // For single product reference, override any existing selection.
-  //         newEntry = {
-  //           productId,
-  //           selections: [
-  //             {
-  //               id: pickerResult.selection[0].id,
-  //               title: pickerResult.selection[0].title,
-  //               image: pickerResult.selection[0].images[0]?.src,
-  //               isVariant: false,
-  //             },
-  //           ],
-  //         };
-  //       } else {
-  //         // For list type, merge new selections.
-  //         let existingSelections = idx !== -1 ? currentEntries[idx].selections : [];
-  //         const newSelections = pickerResult.selection.map((item) => ({
-  //           id: item.id,
-  //           title: item.title,
-  //           image: item.images[0]?.src,
-  //           isVariant: false,
-  //         }));
-  //         const combinedSelections = [...existingSelections, ...newSelections];
-  //         const uniqueSelections = Array.from(new Map(combinedSelections.map((item) => [item.id, item])).values());
-  //         newEntry = { productId, selections: uniqueSelections };
-  //       }
-  //       let newEntries = idx !== -1
-  //         ? currentEntries.map((entry) => (entry.productId === productId ? newEntry : entry))
-  //         : [...currentEntries, newEntry];
-  //       setHasChanges(true);
-  //       return {
-  //         ...prev,
-  //         [activeTabIndex]: {
-  //           ...group,
-  //           [selected]: newEntries,
-  //         },
-  //       };
-  //     });
-  //   }
-  // };
 
 
 
@@ -732,11 +515,20 @@ export default function SelectFreeGift({
       selectedMap[entry.productId] = entry;
     });
 
-    // For products that were initially selected but are now missing, clear their metafield
+    // For products that were initially selected but are now missing
     for (const initialEntry of groupInitial) {
       if (!selectedMap[initialEntry.productId]) {
-        // Clear metafield by sending an empty selection (or null for single references)
-        await updateMetafield(initialEntry.productId, [], activeMetafieldData);
+        if (!activeMetafieldData.type.name.includes("list")) {
+          // Single product reference: delete the metafield
+          const product = products.find((p) => p.id === initialEntry.productId);
+          const metafield = product?.metafields?.find((m) => m.key === selected);
+          if (metafield) {
+            await deleteMetafield(metafield.id);
+          }
+        } else {
+          // List product reference: update with an empty array
+          await updateMetafield(initialEntry.productId, [], activeMetafieldData);
+        }
       }
     }
 
@@ -844,65 +636,30 @@ export default function SelectFreeGift({
 
 
 
-  // Remove product from a single product metafield immediately by updating Shopify as well.
-  // const removeProduct = (productId, selectedItemId) => {
-  //   setSelectedProductsByGroup((prev) => {
-  //     const group = prev[activeTabIndex] || {};
-  //     const currentEntries = group[selected] || [];
-  //     const selectedMetafield = associatedMetafields.find((m) => m.key === selected);
-  //     const id = currentEntries.findIndex((entry) => entry.productId === productId);
-  //     if (id !== -1) {
-  //       let newEntries;
-  //       if (!selectedMetafield?.type?.name.includes("list")) {
-  //         // For single product reference, removal means deleting the entire entry.
-  //         newEntries = currentEntries.filter((entry) => entry.productId !== productId);
-  //         // Immediately update Shopify to clear the metafield.
-  //         updateMetafield(productId, [], selectedMetafield);
-  //       } else {
-  //         const updatedSelections = currentEntries[id].selections.filter(
-  //           (item) => item.id !== selectedItemId
-  //         );
-  //         newEntries = currentEntries.map((entry) =>
-  //           entry.productId === productId ? { productId, selections: updatedSelections } : entry
-  //         );
-  //       }
-  //       setHasChanges(true);
-  //       return {
-  //         ...prev,
-  //         [activeTabIndex]: {
-  //           ...group,
-  //           [selected]: newEntries,
-  //         },
-  //       };
-  //     }
-  //     return prev;
-  //   });
-  // };
 
   const removeProduct = async (productId, selectedItemId) => {
-    const selectedMetafield = associatedMetafields.find((m) => m.key === selected);
-
+    // Update the selectedProductsByGroup state as before
     setSelectedProductsByGroup((prev) => {
       const group = prev[activeTabIndex] || {};
       const currentEntries = group[selected] || [];
-      const id = currentEntries.findIndex((entry) => entry.productId === productId);
+      const entryIndex = currentEntries.findIndex((entry) => entry.productId === productId);
 
-      if (id !== -1) {
+      if (entryIndex !== -1) {
         let newEntries;
+        const selectedMetafield = associatedMetafields.find((m) => m.key === selected);
 
         if (!selectedMetafield?.type?.name.includes("list")) {
-          // Single product reference - remove metafield completely
+          // For single product reference - remove the entire entry
           newEntries = currentEntries.filter((entry) => entry.productId !== productId);
         } else {
-          // Handle list-type metafields
-          const updatedSelections = currentEntries[id].selections.filter(
+          // For list-type metafields, remove only the specific selected item
+          const updatedSelections = currentEntries[entryIndex].selections.filter(
             (item) => item.id !== selectedItemId
           );
           newEntries = currentEntries.map((entry) =>
             entry.productId === productId ? { productId, selections: updatedSelections } : entry
           );
         }
-
         setHasChanges(true);
         return {
           ...prev,
@@ -912,25 +669,23 @@ export default function SelectFreeGift({
           },
         };
       }
-
       return prev;
     });
 
-    // Validate and delete metafield
-    if (!selectedMetafield?.type?.name.includes("list") && selectedMetafield?.id) {
-      const metafieldId = selectedMetafield.id;
+    // Retrieve the correct metafield instance ID from the product's metafields
+    const productData = products.find((p) => p.id === productId);
+    if (!productData) return;
 
-      // Check if ID is in the correct format
-      if (!metafieldId.startsWith("gid://shopify/Metafield/")) {
-        console.error("Invalid metafield ID format:", metafieldId);
+    const productMetafield = productData.metafields.find((m) => m.key === selected);
+    if (productMetafield && productMetafield.id) {
+      if (!productMetafield.id.startsWith("gid://shopify/Metafield/")) {
+        console.error("Invalid metafield ID format:", productMetafield.id);
         return;
       }
-
       try {
-        console.log(`Deleting metafield with ID: ${metafieldId}`);
-        const response = await deleteMetafield(metafieldId);
+        console.log(`Deleting metafield with ID: ${productMetafield.id}`);
+        const response = await deleteMetafield(productMetafield.id);
         console.log("Metafield deletion response:", response);
-
         if (response.errors) {
           console.error("Shopify API Error:", response.errors);
         } else {
@@ -969,51 +724,6 @@ export default function SelectFreeGift({
     }));
   };
 
-  // const handleSaveDescription = async (productId, key) => {
-  //   toggleSaveButtonLoading(productId, true);
-  //   let textFieldValue = textInput[key][productId];
-  //   if (textFieldValue === "") {
-  //     textFieldValue = " ";
-  //   }
-  //   const activeMetafieldData = associatedMetafields.find((metafield) => metafield.key === key);
-  //   const result = await updateProductMetafield(productId, textFieldValue, activeMetafieldData);
-  //   toggleSaveButtonState(productId, result);
-  //   toggleSaveButtonLoading(productId, !result);
-  // };
-
-  // const handleSaveDescription = async (productId, key) => {
-  //   toggleSaveButtonLoading(productId, true);
-  //   let textFieldValue = textInput[key][productId];
-  //   const activeMetafieldData = associatedMetafields.find(
-  //     (metafield) => metafield.key === key
-  //   );
-  //   let result;
-
-  //   if (textFieldValue === "") {
-  //     // Find the product in your products state.
-  //     const product = products.find((p) => p.id === productId);
-  //     // Find the metafield for this product and key.
-  //     const metafield = product?.metafields?.find((m) => m.key === key);
-
-  //     if (metafield) {
-  //       // If the metafield exists, delete it.
-  //       result = await deleteMetafield(metafield.id);
-  //     } else {
-  //       // Nothing to delete—treat as a success.
-  //       result = true;
-  //     }
-  //   } else {
-  //     // Otherwise, update the metafield normally.
-  //     result = await updateProductMetafield(
-  //       productId,
-  //       textFieldValue,
-  //       activeMetafieldData
-  //     );
-  //   }
-
-  //   toggleSaveButtonState(productId, result);
-  //   toggleSaveButtonLoading(productId, !result);
-  // };
 
 
   const handleSaveDescription = async (productId, key) => {
@@ -1240,4 +950,3 @@ export default function SelectFreeGift({
 
 
 
-// Check the payload in api for product variants data
