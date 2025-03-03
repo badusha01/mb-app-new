@@ -60,61 +60,6 @@ export default function Groups() {
 
   const handleGroupNameChange = (value) => setGroupName(value);
 
-  // useEffect(() => {
-  //   if (fetcher.data && fetcher.data.name && fetcher.data.id) {
-  //     setMetafieldGroups((prevGroups) => [
-  //       ...prevGroups,
-  //       fetcher.data
-  //     ]);
-  //   }
-
-  //   if (fetcher.data && fetcher.data.deletedId) {
-  //     setMetafieldGroups((prevGroups) =>
-  //       prevGroups.filter((group) => group.id !== fetcher.data.deletedId)
-  //     );
-  //   }
-  // }, [fetcher.data]);//will be called after action submit
-
-  // useEffect(() => {
-  //   if (fetcher.data && fetcher.data.name && fetcher.data.id) {
-  //     setMetafieldGroups((prevGroups) => [
-  //       ...prevGroups,
-  //       fetcher.data
-  //     ]);
-  //   }
-
-  //   if (fetcher.data && fetcher.data.success && fetcher.data.updatedGroup) {
-  //     setMetafieldGroups((prevGroups) => {
-  //       const updatedGroups = [...prevGroups];
-  //       const groupIndex = updatedGroups.findIndex((group) => group.id === fetcher.data.updatedGroup.id);
-
-  //       if (groupIndex !== -1) {
-  //         updatedGroups[groupIndex] = fetcher.data.updatedGroup;
-  //       }
-  //       return updatedGroups;
-  //     });
-  //     setUpdateIndex(!updateIndex); //update the tabIndex
-  //   }
-
-  //   if (fetcher.data && fetcher.data.deletedId && fetcher.data.tabIndex) {
-  //     setMetafieldGroups((prevGroups) =>
-  //       prevGroups.filter((group) => group.id !== fetcher.data.deletedId)
-  //     );
-
-  //     setSelectedMetafields((prev) => {
-  //       const updatedGroups = [...prev];
-  //       const groupIndex = fetcher.data.tabIndex
-
-  //       if (groupIndex !== -1) {
-  //         updatedGroups.splice(groupIndex, 1);
-  //       }
-  //       return updatedGroups;
-  //     });
-
-  //     setActiveTabIndex(0);
-  //   }
-  // }, [fetcher.data]);
-
   useEffect(() => {
 
     if (!fetcher.data) return;
@@ -388,8 +333,11 @@ export default function Groups() {
                     </div>
                   </div>
 
-                  <SelectFreeGift groupId={group.id} associatedMetafields={selectedMetafields[activeTabIndex] || []} tabIndex={updateIndex} activeTabIndex={activeTabIndex} />
-
+                  {selectedMetafields[activeTabIndex] && selectedMetafields[activeTabIndex].length > 0 ? (
+                    <SelectFreeGift groupId={group.id} associatedMetafields={selectedMetafields[activeTabIndex] || []} tabIndex={updateIndex} activeTabIndex={activeTabIndex} />
+                  ) : (
+                    <Text alignment='center'>No metafields are selected</Text>
+                  )}
                 </div>
               )}
             </div>
@@ -434,14 +382,3 @@ export default function Groups() {
   );
 }
 
-
-/*
-Use console.log() in each function so that you can see which ones are working when tab is switched or when a metafields are selected and unselected
-*/
-
-
-/*
-Fixed the issue with duplicated names of group
-Fixed the issue of not showing selected metafields of a group when it is rendered
-
-*/

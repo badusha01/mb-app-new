@@ -278,6 +278,8 @@ export default function SelectFreeGift({
   const [selected, setSelected] = useState(""); // current metafield key
   const [saveButton, setSaveButton] = useState({});
   const [disabledSaveButton, setDisabledSaveButton] = useState({});
+  const [deleteButtonLoading, setDeleteButtonLoading] = useState({});
+  const [disabledDeleteButton, setDisabledDeleteButton] = useState({});
   const [textInput, setTextInput] = useState({});
   const [isProductMetafield, setIsProductMetafield] = useState(false);
 
@@ -520,7 +522,7 @@ export default function SelectFreeGift({
       if (!selectedMap[initialEntry.productId]) {
         if (!activeMetafieldData.type.name.includes("list")) {
           // Single product reference: delete the metafield
-          const product = products.find((p) => p.id === initialEntry.productId);
+          const product = products.find((product) => product.id === initialEntry.productId);
           const metafield = product?.metafields?.find((m) => m.key === selected);
           if (metafield) {
             await deleteMetafield(metafield.id);
@@ -673,7 +675,7 @@ export default function SelectFreeGift({
     });
 
     // Retrieve the correct metafield instance ID from the product's metafields
-    const productData = products.find((p) => p.id === productId);
+    const productData = products.find((product) => product.id === productId);
     if (!productData) return;
 
     const productMetafield = productData.metafields.find((m) => m.key === selected);
@@ -713,8 +715,24 @@ export default function SelectFreeGift({
     }));
   };
 
+  const toggleDeleteButtonState = (id, state) => {
+    setDisabledDeleteButton((prev) => ({
+      ...prev,
+      [id]: state,
+    }));
+  };
+
+
+  const toggleDeleteButtonLoading = (id, state) => {
+    setDeleteButtonLoading((prev) => ({
+      ...prev,
+      [id]: state,
+    }));
+  };
+
   const handleTextChange = (id, textValue, key) => {
     toggleSaveButtonState(id, false);
+    toggleDeleteButtonState(id, false);
     setTextInput((prev) => ({
       ...prev,
       [key]: {
@@ -725,6 +743,44 @@ export default function SelectFreeGift({
   };
 
 
+  const handleDeleteDescription = async (productId, key) => {
+    const product = products.find((product) => product.id === productId);
+    const metafield = product?.metafields?.find((m) => m.key === key);
+
+    if (metafield) {
+      toggleDeleteButtonLoading(productId, true); // Show loading state for Delete button
+      const deleteResult = await deleteMetafield(metafield.id);
+
+      if (deleteResult.success) {
+        // Update products state by removing the deleted metafield
+        setProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product.id === productId
+              ? {
+                ...product,
+                metafields: product.metafields.filter((m) => m.id !== deleteResult.deletedId),
+              }
+              : product
+          )
+        );
+        // Clear the text input for this product and metafield
+        setTextInput((prev) => ({
+          ...prev,
+          [key]: {
+            ...(prev[key] || {}),
+            [productId]: "",
+          },
+        }));
+        app.toast.show("Metafield deleted successfully");
+        toggleDeleteButtonState(productId, true); // Disable Delete button after successful deletion
+      } else {
+        console.error("Failed to delete metafield:", deleteResult.errors);
+        app.toast.show("Failed to delete metafield");
+        toggleDeleteButtonState(productId, false); // Keep enabled if deletion fails
+      }
+      toggleDeleteButtonLoading(productId, false); // Reset loading state for Delete button
+    }
+  };
 
   const handleSaveDescription = async (productId, key) => {
     toggleSaveButtonLoading(productId, true);
@@ -735,20 +791,20 @@ export default function SelectFreeGift({
     let result;
 
     if (textFieldValue === "") {
-      const product = products.find((p) => p.id === productId);
+      const product = products.find((product) => product.id === productId);
       const metafield = product?.metafields?.find((m) => m.key === key);
       if (metafield) {
         const deleteResult = await deleteMetafield(metafield.id);
         if (deleteResult.success) {
           // Update products state by removing the deleted metafield
           setProducts((prevProducts) =>
-            prevProducts.map((p) =>
-              p.id === productId
+            prevProducts.map((product) =>
+              product.id === productId
                 ? {
-                  ...p,
-                  metafields: p.metafields.filter((m) => m.id !== deleteResult.deletedId),
+                  ...product,
+                  metafields: product.metafields.filter((m) => m.id !== deleteResult.deletedId),
                 }
-                : p
+                : product
             )
           );
           result = true;
@@ -769,13 +825,13 @@ export default function SelectFreeGift({
       if (updateResult.success) {
         // Update products state with the new metafields
         setProducts((prevProducts) =>
-          prevProducts.map((p) =>
-            p.id === productId
+          prevProducts.map((product) =>
+            product.id === productId
               ? {
-                ...p,
+                ...product,
                 metafields: updateResult.metafields,
               }
-              : p
+              : product
           )
         );
         result = true;
@@ -866,6 +922,15 @@ export default function SelectFreeGift({
                                     loading={saveButton[id]}
                                   >
                                     Save
+                                  </Button>
+                                  <Button
+                                    variant="secondary"
+                                    destructive
+                                    onClick={() => handleDeleteDescription(id, metafieldKey)}
+                                    disabled={disabledDeleteButton[id]}
+                                    loading={deleteButtonLoading[id]}
+                                  >
+                                    Delete
                                   </Button>
                                 </ButtonGroup>
                               </>
