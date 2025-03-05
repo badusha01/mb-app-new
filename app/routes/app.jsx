@@ -25,6 +25,7 @@ export default function App() {
         </Link>
         <Link to="/app/groups">Groups</Link>
         {/* <Link to="/app/select-free-gifts">Free  Gifts</Link> */}
+        <Link to="/app/product-reference">Product Reference</Link>
       </NavMenu>
       <Outlet />
     </AppProvider>

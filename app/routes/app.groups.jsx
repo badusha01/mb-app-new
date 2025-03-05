@@ -97,18 +97,18 @@ export default function Groups() {
         return updatedGroups;
       });
 
-      setTempSelectedMetafields([]);
+      // setTempSelectedMetafields([]);
       setActiveTabIndex(0);
     }
   }, [fetcher.data]);
 
   useEffect(() => {
-    const initializedMetafields = initializeMetafields();
-    setTempSelectedMetafields(initializedMetafields[0] || []);
+    initializeMetafields();
+    // setTempSelectedMetafields(initializedMetafields[0] || []);
   }, []);
 
   useEffect(() => {
-    setTempSelectedMetafields(selectedMetafields[activeTabIndex] || []);
+    // setTempSelectedMetafields(selectedMetafields[activeTabIndex] || []);
   }, [activeTabIndex, selectedMetafields]);
 
 
@@ -125,17 +125,11 @@ export default function Groups() {
         }));
       });
       setSelectedMetafields(newSelectedMetafields);
-      console.log('initializeMetafields executed');
       return newSelectedMetafields;
     }
     return [];
   }
 
-  // const handleAddGroup = (event) => {
-  //   event.preventDefault();
-  //   fetcher.submit({ name: groupName }, { method: 'post' });
-  //   setGroupName('');
-  // };
 
   const handleAddGroup = (event) => {
     event.preventDefault();
@@ -148,7 +142,6 @@ export default function Groups() {
     }
     fetcher.submit({ name: groupName }, { method: 'post' });
     setGroupName('');
-    console.log("HandleAddGroup Executed");
   };
 
   const handleDeleteGroup = (id) => {
@@ -172,7 +165,7 @@ export default function Groups() {
     console.log('handleTabChange is executed');
     console.log('Selected Metafields:', selectedMetafields);
     setActiveTabIndex(index);
-    setTempSelectedMetafields(selectedMetafields[index]);
+    // setTempSelectedMetafields(selectedMetafields[index]);
   };
 
   // We need to use the groupId
@@ -238,7 +231,6 @@ export default function Groups() {
           type: definition.type
         }]
       }
-      console.log('handleCheckboxChange is executed');
       return updated;
     });
   };
@@ -285,12 +277,8 @@ export default function Groups() {
       console.log("Updated Selected Metafields: ", updated);
       return updated
     })
-    setTempSelectedMetafields(selectedMetafields[activeTabIndex]);
+    // setTempSelectedMetafields(selectedMetafields[activeTabIndex]);
     setModalOpen(false);
-    console.log("HandleAssign Executed");
-    // setTimeout(() => {
-    //   window.location.reload();
-    // }, 0);
   };
 
 

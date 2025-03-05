@@ -3,7 +3,7 @@
 client_id = "1d4a6fa7d4daa3978c0c68ad752d27f4"
 name = "MB Merchandising"
 handle = "mb-merchandising-v04"
-application_url = "https://gmc-band-voice-waters.trycloudflare.com"
+application_url = "https://liked-barbie-marvel-realty.trycloudflare.com"
 embedded = true
 
 [build]
@@ -21,9 +21,9 @@ scopes = "read_products,write_products"
 
 [auth]
 redirect_urls = [
-  "https://gmc-band-voice-waters.trycloudflare.com/auth/callback",
-  "https://gmc-band-voice-waters.trycloudflare.com/auth/shopify/callback",
-  "https://gmc-band-voice-waters.trycloudflare.com/api/auth/callback"
+  "https://liked-barbie-marvel-realty.trycloudflare.com/auth/callback",
+  "https://liked-barbie-marvel-realty.trycloudflare.com/auth/shopify/callback",
+  "https://liked-barbie-marvel-realty.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

@@ -84,7 +84,7 @@ function fetchProducts(searchTerm = "", afterCursor = null) {
   })
     .then((res) => res.json())
     .then((data) => {
-      console.log("Fetched Products with Metafields:", data.data.products.edges);
+      // console.log("Fetched Products with Metafields:", data.data.products.edges);
       return data;
     });
 }
@@ -118,7 +118,7 @@ async function updateMetafield(productId, gifts, metafieldData) {
     ? gifts.map((gift) => `${gift.id}`)
     : gifts.length > 0
       ? gifts[0].id
-      : null; // if empty, clear it
+      : null;
 
   const variables = {
     input: {
@@ -208,7 +208,7 @@ const updateProductMetafield = async (productId, value, activeMetafieldData) => 
     const responseData = await response.json();
     if (responseData.errors) {
       shopify.toast.show(`Error updating metafield: ${responseData.errors}`);
-      console.log("Error updating metafield:", responseData.errors);
+      // console.log("Error updating metafield:", responseData.errors);
       return { success: false, errors: responseData.errors };
     } else if (responseData.data.productUpdate.userErrors.length > 0) {
       shopify.toast.show("User errors");
@@ -290,7 +290,7 @@ export default function SelectFreeGift({
     const formattedProducts = data.data.products.edges.map((edge) => {
       const product = edge.node;
       const giftVariantsMetafield = product.metafields?.edges?.find(
-        (metafield) => metafield.node.key === "recommendations"
+        (metafield) => metafield.node.key === "giftvariants"
       );
       const prePopulatedVariants = giftVariantsMetafield
         ? JSON.parse(giftVariantsMetafield.node.value).map((variantId) => ({
@@ -366,7 +366,7 @@ export default function SelectFreeGift({
             selections = parsedIds.map((id) => {
               // Find the product details from referenceProducts that match this id.
               const productDetail = metafield.referenceProducts.find((ref) => ref.id === id);
-              console.log("product details:", productDetail);
+              // console.log("product details:", productDetail);
 
               return {
                 id,
@@ -401,8 +401,8 @@ export default function SelectFreeGift({
     });
 
 
-    console.log("formattedProducts", formattedProducts);
-    console.log("newSelectedProductsObj", newSelectedProductsObj);
+    // console.log("formattedProducts", formattedProducts);
+    // console.log("newSelectedProductsObj", newSelectedProductsObj);
 
     setProducts(append ? [...products, ...formattedProducts] : formattedProducts);
     setTextInput(append ? { ...textInput, ...newTextInputValues } : newTextInputValues);
@@ -467,8 +467,13 @@ export default function SelectFreeGift({
     loadProducts();
   }, [searchTerm, activeTabIndex]);
 
+
   useEffect(() => {
-    console.log("Updated selectedProductsByGroup:", selectedProductsByGroup);
+    removeProduct();
+  }, [selectedProductsByGroup]);
+
+  useEffect(() => {
+    // console.log("Updated selectedProductsByGroup:", selectedProductsByGroup);
   }, [selectedProductsByGroup, activeTabIndex]);
 
   useEffect(() => {
@@ -483,12 +488,12 @@ export default function SelectFreeGift({
   }, [associatedMetafields]);
 
   useEffect(() => {
-    console.log("activeTabIndex:", activeTabIndex);
+    // console.log("activeTabIndex:", activeTabIndex);
   }, [activeTabIndex]);
 
 
   useEffect(() => {
-    console.log("selectedProductsByGroup updated:", selectedProductsByGroup);
+    // console.log("selectedProductsByGroup updated:", selectedProductsByGroup);
   }, [selectedProductsByGroup]);
 
   const loadNextPage = () => {
@@ -529,7 +534,7 @@ export default function SelectFreeGift({
           }
         } else {
           // List product reference: update with an empty array
-          await updateMetafield(initialEntry.productId, [], activeMetafieldData);
+          await updateMetafield(initialEntry.productId, [], [activeMetafieldData]);
         }
       }
     }
@@ -549,7 +554,6 @@ export default function SelectFreeGift({
       }
     }
     setHasChanges(false);
-    console.log("Metafields updated for changed products.");
   };
 
 
@@ -560,8 +564,8 @@ export default function SelectFreeGift({
     const entry = currentEntries.find((e) => e.productId === productId);
     const entryIDs = entry ? entry.selections.map((item) => ({ id: item.id })) : [];
 
-    console.log("Entry:", entry);
-    console.log("ENIDS:", entryIDs);
+    // console.log("Entry:", entry);
+    // console.log("ENIDS:", entryIDs);
 
     const pickerResult = await app.resourcePicker({
       type: "product",
@@ -570,7 +574,6 @@ export default function SelectFreeGift({
       selectionIds: entryIDs,
     });
 
-    console.log("PickerResult:", pickerResult);
 
     // Update state if pickerResult is defined
     if (pickerResult && pickerResult.selection) {
@@ -674,32 +677,28 @@ export default function SelectFreeGift({
       return prev;
     });
 
+
     // Retrieve the correct metafield instance ID from the product's metafields
     const productData = products.find((product) => product.id === productId);
     if (!productData) return;
 
     const productMetafield = productData.metafields.find((m) => m.key === selected);
     if (productMetafield && productMetafield.id) {
-      if (!productMetafield.id.startsWith("gid://shopify/Metafield/")) {
-        console.error("Invalid metafield ID format:", productMetafield.id);
-        return;
-      }
+
       try {
-        console.log(`Deleting metafield with ID: ${productMetafield.id}`);
+        // console.log(`Deleting metafield with ID: ${productMetafield.id}`);
         const response = await deleteMetafield(productMetafield.id);
-        console.log("Metafield deletion response:", response);
+        // console.log("Metafield deletion response:", response);
         if (response.errors) {
           console.error("Shopify API Error:", response.errors);
         } else {
-          console.log("Metafield deleted successfully");
+          // console.log("Metafield deleted successfully");
         }
       } catch (error) {
         console.error("Error deleting metafield:", error);
       }
     }
   };
-
-
 
   const toggleSaveButtonState = (id, state) => {
     setDisabledSaveButton((prev) => ({
@@ -884,7 +883,6 @@ export default function SelectFreeGift({
                     resourceName={{ singular: "product", plural: "products" }}
                     items={products}
                     renderItem={(item) => {
-                      console.log("rendering item", item);
                       const { id, title } = item;
                       const groupData = selectedProductsByGroup[activeTabIndex] || {};
                       const currentEntries = groupData[selected] || [];
@@ -892,9 +890,9 @@ export default function SelectFreeGift({
                       const selectedItems = entry ? entry.selections : [];
                       const metafieldKey = selected;
                       const selectedMetafield = options.find((option) => option.value === selected);
-                      console.log("Selected Items:", selectedItems);
-                      console.log("selected Products by group:", selectedProductsByGroup[activeTabIndex])
-                      console.log("selected group data", currentEntries)
+                      // console.log("Selected Items:", selectedItems);
+                      // console.log("selected Products by group:", selectedProductsByGroup[activeTabIndex])
+                      // console.log("selected group data", currentEntries)
                       const inputValue = textInput[metafieldKey]?.[id] || "";
                       return (
                         <ResourceItem id={id} accessibilityLabel={`View details for ${title}`}>
